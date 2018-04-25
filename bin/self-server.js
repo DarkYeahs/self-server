@@ -27,11 +27,18 @@ program
     var httpsServer = https.createServer(credentials, app);
     var PORT = argv.p || 80;
     var SSLPORT = argv.P || 443;
-    
-    httpServer.listen(PORT, function() {
+
+    let request = httpServer.listen(PORT, function() {
         console.log('HTTP Server is running on: http://localhost:%s', PORT);
         opn('http://localhost:' + PORT)
-    });
+    })
+    
+    request.on('error', function (e) {
+        PORT++
+
+        httpServer.listen(PORT);
+    })
+
     httpsServer.listen(SSLPORT, function() {
         console.log('HTTPS Server is running on: https://localhost:%s', SSLPORT);
         // opn('https://localhost:' + SSLPORT)
