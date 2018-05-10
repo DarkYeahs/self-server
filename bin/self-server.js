@@ -14,6 +14,7 @@ const path       = require('path')
 const argv       = require('optimist')
                     .boolean('cors')
                     .argv;
+const config = require('../config')
 
 let privateKey, certificate, credentials, httpServer, httpsServer, PORT, SSLPORT, request
 
@@ -25,13 +26,15 @@ program
     credentials = {key: privateKey, cert: certificate};
     PORT = argv.p || 80;
     SSLPORT = argv.P || 443;
+    ROOT = argv.r || 'D:\\test'
     
     httpServer = http.createServer(app);
     httpsServer = https.createServer(credentials, app);
 
     request = httpServer.listen(PORT, function() {
         console.log('HTTP Server is running on: http://localhost:%s', PORT);
-        opn('http://localhost:' + PORT)
+        if (PORT === 80) opn(config.host)
+        else opn(config.host + ':' + PORT)
     })
 
     httpsServer.listen(SSLPORT, function() {
@@ -46,8 +49,8 @@ program
     })
 
     app.use(ecstatic({
-        root: path.resolve('D:\\test'),
+        root: path.resolve(ROOT),
         showdir: true,
     }))
-    
-    app.use('/', express.static(path.resolve('D:\\test')));
+
+    app.use('/', express.static(path.resolve(ROOT)));
