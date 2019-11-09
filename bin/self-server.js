@@ -26,22 +26,27 @@ program
     credentials = {key: privateKey, cert: certificate};
     PORT = argv.p || 80;
     SSLPORT = argv.P || 443;
-    ROOT = argv.r || 'D:\\test'
-    
+    ROOT = argv.r || process.cwd()
+
     httpServer = http.createServer(app);
     httpsServer = https.createServer(credentials, app);
 
     request = httpServer.listen(PORT, function() {
         console.log('HTTP Server is running on: http://localhost:%s', PORT);
-        if (PORT === 80) opn(config.host)
-        else opn(config.host + ':' + PORT)
+        // if (PORT === 8083) opn(config.host)
+       opn(config.host + ':' + PORT)
     })
+
+    app.use(function(err, req, res, next) {
+        console.error(err.stack);
+        res.status(500).send('Something broke!');
+    });
 
     httpsServer.listen(SSLPORT, function() {
         console.log('HTTPS Server is running on: https://localhost:%s', SSLPORT);
         // opn('https://localhost:' + SSLPORT)
     });
-    
+
     request.on('error', function (e) {
         PORT++
 
